@@ -1,0 +1,6 @@
+{
+  "name": "GEM AI",
+  "description": "A premium Apple-style landing page for GEM Neural Companion",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
