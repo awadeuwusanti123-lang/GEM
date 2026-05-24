@@ -337,18 +337,20 @@ function Features() {
 }
 
 // --- Interactive Mascot Component ---
-function InteractiveMascot({ className = "", glowColor = "rgba(0,242,254,0.4)" }: { className?: string, glowColor?: string }) {
+function InteractiveMascot({ className = "", glowColor = "rgba(0,242,254,0.4)", isFloating = false }: { className?: string, glowColor?: string, isFloating?: boolean }) {
   return (
     <div className={`relative z-20 flex justify-center items-center ${className}`}>
        <div className="w-full h-full flex items-center justify-center relative group/mascot">
          <div className="w-full h-full flex items-center justify-center">
-           <img 
+           <motion.img 
              src="https://drive.google.com/thumbnail?id=1FkdeDTBIp7pNZ9x1vtMPVtQQ7BtBedXw&sz=w1000" 
              alt="GEM Mascot" 
              className="w-full h-full object-contain mix-blend-screen transition-all duration-300 origin-center"
              style={{ 
                filter: `drop-shadow(0 0 30px ${glowColor}) brightness(1.2)`
              }}
+             animate={isFloating ? { y: [0, -20, 0], scale: [1, 1.05, 1] } : {}}
+             transition={isFloating ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : {}}
              referrerPolicy="no-referrer" 
            />
          </div>
@@ -428,7 +430,7 @@ function TheFlow() {
           >
              <div className="absolute inset-0 bg-gradient-to-tr from-[#00F2FE] via-[#8E2DE2] to-[#FF9A9E] blur-[50px] md:blur-[100px] opacity-40 animate-[spin_10s_linear_infinite]" />
              <div className="relative w-32 h-32 md:w-56 md:h-56 flex items-center justify-center group overflow-visible">
-                <InteractiveMascot className="w-48 h-48 md:w-80 md:h-80 shrink-0" glowColor="rgba(255,255,255,0.4)" />
+                <InteractiveMascot className="w-48 h-48 md:w-80 md:h-80 shrink-0" glowColor="rgba(255,255,255,0.4)" isFloating />
              </div>
           </motion.div>
 
