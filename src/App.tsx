@@ -527,20 +527,25 @@ function Features() {
 }
 
 // --- Interactive Mascot Component ---
-function InteractiveMascot({ className = "", glowColor = "rgba(0,242,254,0.4)", isFloating = false, isSurprised = false }: { className?: string, glowColor?: string, isFloating?: boolean, isSurprised?: boolean }) {
+function InteractiveMascot({ className = "", glowColor = "rgba(0,242,254,0.4)", isFloating = false, isSurprised = false, interactiveOnHover = false }: { className?: string, glowColor?: string, isFloating?: boolean, isSurprised?: boolean, interactiveOnHover?: boolean }) {
+  const { playHover, playClick } = useSound();
   return (
     <div className={`relative z-20 flex justify-center items-center ${className}`}>
        <div className="w-full h-full flex items-center justify-center relative group/mascot">
          <div className="w-full h-full flex items-center justify-center">
            <motion.img 
+             onMouseEnter={interactiveOnHover ? playHover : undefined}
+             onClick={interactiveOnHover ? playClick : undefined}
+             whileHover={interactiveOnHover ? { scale: 1.15, rotate: [0, -5, 5, -5, 0], filter: `drop-shadow(0 0 60px ${glowColor}) brightness(1.4)`, transition: { type: "tween", duration: 0.4 } } : undefined}
+             whileTap={interactiveOnHover ? { scale: 0.9 } : undefined}
              src="https://drive.google.com/thumbnail?id=1FkdeDTBIp7pNZ9x1vtMPVtQQ7BtBedXw&sz=w1000" 
              alt="GEM Mascot" 
-             className="w-full h-full object-contain mix-blend-screen transition-all duration-300 origin-center"
+             className={`w-full h-full object-contain mix-blend-screen transition-all duration-300 origin-center ${interactiveOnHover ? 'cursor-pointer' : ''}`}
              style={{ 
                filter: `drop-shadow(0 0 30px ${glowColor}) brightness(1.2)`
              }}
-             animate={isFloating ? { y: [0, -20, 0], scale: [1, 1.05, 1] } : (isSurprised ? { scale: 1.25, rotate: [0, -10, 10, -10, 10, 0] } : { scale: 1, rotate: 0 })}
-             transition={isFloating ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : (isSurprised ? { duration: 0.5, repeat: Infinity, repeatType: "loop" } : { type: "spring" })}
+             animate={isFloating && !interactiveOnHover ? { y: [0, -20, 0], scale: [1, 1.05, 1] } : (isSurprised ? { scale: 1.25, rotate: [0, -10, 10, -10, 10, 0] } : { scale: 1, rotate: 0 })}
+             transition={isFloating && !interactiveOnHover ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : (isSurprised ? { type: "tween", duration: 0.5, repeat: Infinity, repeatType: "loop" } : { type: "spring" })}
              referrerPolicy="no-referrer" 
            />
          </div>
@@ -557,12 +562,13 @@ function FlowNode({ icon: Icon, delay = 0, title }: { icon: React.ElementType, d
       whileInView={{ opacity: 1, scale: 1 }}
       transition={{ delay, duration: 0.5, type: "spring" }}
       viewport={{ once: true }}
-      className="flex flex-col items-center gap-2 relative z-10"
+      className="flex flex-col items-center gap-2 relative z-10 group"
     >
-       <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-white/[0.03] backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:bg-white/[0.1] hover:scale-110 transition-all cursor-pointer">
-          <Icon className="w-5 h-5 md:w-6 md:h-6 text-white/70" />
+       <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-white/[0.03] backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.05)] group-hover:bg-white/[0.1] group-hover:scale-110 group-hover:border-[#00F2FE]/30 transition-all duration-300 cursor-pointer relative">
+          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#00F2FE] to-[#8E2DE2] blur-md opacity-0 group-hover:opacity-60 transition-opacity duration-500 -z-10" />
+          <Icon className="w-5 h-5 md:w-6 md:h-6 text-white/70 group-hover:text-white transition-colors relative z-10" />
        </div>
-       <span className="font-sans text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white/40">{title}</span>
+       <span className="font-sans text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white/40 transition-colors group-hover:text-[#00F2FE]">{title}</span>
     </motion.div>
   );
 }
@@ -620,7 +626,7 @@ function TheFlow() {
           >
              <div className="absolute inset-0 bg-gradient-to-tr from-[#00F2FE] via-[#8E2DE2] to-[#FF9A9E] blur-[50px] md:blur-[100px] opacity-40 animate-[spin_10s_linear_infinite]" />
              <div className="relative w-32 h-32 md:w-56 md:h-56 flex items-center justify-center group overflow-visible">
-                <InteractiveMascot className="w-48 h-48 md:w-80 md:h-80 shrink-0" glowColor="rgba(255,255,255,0.4)" isFloating />
+                <InteractiveMascot className="w-48 h-48 md:w-80 md:h-80 shrink-0" glowColor="rgba(255,255,255,0.4)" isFloating interactiveOnHover />
              </div>
           </motion.div>
 
@@ -727,10 +733,10 @@ function Testimonials() {
         {t.testimonials.items.map((testimonial, i) => (
           <motion.div 
             key={i}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.8 }}
-            viewport={{ once: true }}
+            transition={{ delay: i * 0.2, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true, margin: "-50px" }}
             className="p-8 rounded-[2rem] bg-white/[0.02] border border-white/10 backdrop-blur-md flex flex-col gap-6 group hover:bg-white/[0.04] transition-colors"
           >
              <div className="flex gap-1 text-[#00F2FE]">
@@ -777,10 +783,10 @@ function FAQ() {
           return (
             <motion.div 
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
+              transition={{ delay: i * 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true, margin: "-50px" }}
               className={`border backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-300 ${isOpen ? 'border-[#00F2FE]/40 bg-gradient-to-br from-[#00F2FE]/10 to-transparent shadow-[0_0_30px_rgba(0,242,254,0.15)]' : 'border-white/10 bg-white/[0.01] hover:bg-white/[0.03] hover:border-[#00F2FE]/20'}`}
             >
               <button 
