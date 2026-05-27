@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from 'react';
-import { motion, useScroll, useSpring, useTransform, useMotionValue, useAnimation } from 'motion/react';
-import { Brain, ArrowUpRight, Zap, Sparkles, MessageSquare, Layers, Network, Fingerprint, Activity, Calendar, Star, Plus, Minus, ArrowRight } from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { motion, useScroll, useSpring, useTransform, useMotionValue, useMotionValueEvent, useAnimation, useInView, AnimatePresence } from 'motion/react';
+import { Brain, ArrowUpRight, Zap, Sparkles, MessageSquare, Layers, Network, Fingerprint, Activity, Calendar, Star, Plus, Minus, ArrowRight, Menu, X, Volume2, VolumeX, ArrowUp } from 'lucide-react';
 
 import { FaApple, FaGooglePlay } from "react-icons/fa";
 import { useLanguage, LanguageProvider } from './LanguageContext';
+import { SoundProvider, useSound } from './SoundContext';
 
 // --- Global Progress Bar ---
 function ScrollProgress() {
@@ -46,16 +47,27 @@ function LanguageSwitcher() {
 // --- Navbar ---
 function Navbar() {
   const { t } = useLanguage();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isMuted, toggleMute } = useSound();
+
   return (
-    <motion.nav 
-      initial={{ y: -30, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[90%] max-w-5xl"
-    >
-      <div className="glass-pill px-3 py-3 md:px-5 md:py-2.5 rounded-[2rem] md:rounded-full border border-white/10 bg-black/60 backdrop-blur-2xl hover:bg-black/70 transition-colors duration-500 hover:shadow-[0_0_30px_rgba(0,242,254,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 overflow-hidden">
-        <div className="flex items-center justify-between w-full md:w-auto">
-          <div className="flex items-center cursor-pointer group px-2">
+    <>
+      <motion.nav 
+        initial={{ y: -30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[90%] max-w-5xl"
+      >
+        <div className="glass-pill px-3 py-3 md:px-5 md:py-2.5 rounded-full border border-white/10 bg-[#0A0A0A]/95 supports-[backdrop-filter]:bg-[#0A0A0A]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_4px_40px_rgba(0,242,254,0.15)] flex items-center justify-between gap-1 md:gap-4 overflow-hidden relative">
+          
+          {/* Mobile Menu Toggle button */}
+          <div className="md:hidden flex items-center pr-1 shrink-0">
+            <button onClick={() => setMobileMenuOpen(true)} className="p-2 text-white/70 hover:text-white transition-colors">
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex items-center cursor-pointer group shrink-0 flex-1 justify-start md:flex-none">
             <div className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 flex items-center justify-center relative shrink-0">
                <img 
                  src="https://drive.google.com/thumbnail?id=1FkdeDTBIp7pNZ9x1vtMPVtQQ7BtBedXw&sz=w1000" 
@@ -70,37 +82,101 @@ function Navbar() {
             <span className="font-sans font-bold text-lg md:text-xl lg:text-2xl tracking-tight text-white leading-none ml-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-[#00F2FE] transition-all duration-300">GEM</span>
           </div>
 
-          <div className="flex items-center gap-2 md:hidden ml-4">
-            <LanguageSwitcher />
+          <div className="hidden md:flex items-center justify-center flex-1 gap-4 lg:gap-8 text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 px-2 lg:px-0">
+            <a href="#features" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.neuralSync}</a>
+            <a href="#flow" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.ecosystem}</a>
+            <a href="#testimonials" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.reviews}</a>
+            <a href="#faq" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.faq}</a>
+          </div>
+
+          <div className="flex items-center gap-1 md:gap-2 lg:gap-4 shrink-0 justify-end">
+            <button 
+              onClick={toggleMute}
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors border border-white/10 shrink-0 select-none outline-none focus:ring-2 focus:ring-[#00F2FE]/50"
+            >
+              {isMuted ? <VolumeX className="w-4 h-4 md:w-5 md:h-5 text-white/70" /> : <Volume2 className="w-4 h-4 md:w-5 md:h-5 text-white" />}
+            </button>
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
             <motion.button 
               whileTap={{ scale: 0.95 }}
               whileHover={{ scale: 1.05 }}
-              className="flex items-center justify-center px-4 py-2 rounded-full bg-white text-black text-[9px] font-bold uppercase tracking-wider hover:bg-[#00F2FE] hover:text-black transition-colors whitespace-nowrap shrink-0"
+              className="flex items-center justify-center px-4 py-2 lg:px-6 lg:py-2.5 rounded-full bg-white text-black text-[9px] lg:text-xs font-bold uppercase tracking-wider hover:bg-[#00F2FE] hover:text-black transition-colors whitespace-nowrap shrink-0 hover:shadow-[0_0_20px_rgba(0,242,254,0.4)]"
             >
               {t.navbar.getAccess}
             </motion.button>
           </div>
         </div>
+      </motion.nav>
 
-        <div className="flex items-center justify-start md:justify-center w-full md:w-auto gap-4 lg:gap-8 text-[9px] md:text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 px-2 md:px-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] min-h-[24px]">
-          <a href="#features" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.neuralSync}</a>
-          <a href="#flow" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.ecosystem}</a>
-          <a href="#testimonials" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.reviews}</a>
-          <a href="#faq" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.faq}</a>
-        </div>
+      {/* Mobile Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] md:hidden"
+            />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 bottom-0 w-[280px] bg-[#050505] border-r border-[#00F2FE]/20 z-[70] md:hidden p-6 flex flex-col shadow-[0_0_50px_rgba(0,242,254,0.1)]"
+            >
+              <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center group">
+                  <div className="w-8 h-8 flex items-center justify-center relative shrink-0">
+                     <img 
+                       src="https://drive.google.com/thumbnail?id=1FkdeDTBIp7pNZ9x1vtMPVtQQ7BtBedXw&sz=w1000" 
+                       alt="GEM Mascot" 
+                       className="w-full h-full object-contain mix-blend-screen"
+                       style={{ filter: `drop-shadow(0 0 10px rgba(0,242,254,0.4)) brightness(1.2)` }}
+                       referrerPolicy="no-referrer"
+                     />
+                  </div>
+                  <span className="font-sans font-bold text-xl tracking-tight text-white leading-none ml-2">GEM</span>
+                </div>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 -mr-2 text-white/50 hover:text-white transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
 
-        <div className="hidden md:flex items-center gap-2 lg:gap-4 shrink-0">
-          <LanguageSwitcher />
-          <motion.button 
-            whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center justify-center px-4 py-2 lg:px-6 lg:py-2.5 rounded-full bg-white text-black text-[10px] lg:text-xs font-bold uppercase tracking-wider hover:bg-[#00F2FE] hover:text-black transition-colors whitespace-nowrap shrink-0 hover:shadow-[0_0_20px_rgba(0,242,254,0.4)]"
-          >
-            {t.navbar.getAccess}
-          </motion.button>
-        </div>
-      </div>
-    </motion.nav>
+              <div className="flex flex-col gap-6 flex-1 text-[11px] font-bold uppercase tracking-[0.2em] text-white/60">
+                <a href="#features" onClick={() => setMobileMenuOpen(false)} className="hover:text-white transition-colors flex items-center gap-3">
+                  <Layers className="w-4 h-4 text-[#00F2FE]" />
+                  {t.navbar.neuralSync}
+                </a>
+                <a href="#flow" onClick={() => setMobileMenuOpen(false)} className="hover:text-white transition-colors flex items-center gap-3">
+                  <Network className="w-4 h-4 text-[#00F2FE]" />
+                  {t.navbar.ecosystem}
+                </a>
+                <a href="#testimonials" onClick={() => setMobileMenuOpen(false)} className="hover:text-white transition-colors flex items-center gap-3">
+                  <MessageSquare className="w-4 h-4 text-[#00F2FE]" />
+                  {t.navbar.reviews}
+                </a>
+                <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="hover:text-white transition-colors flex items-center gap-3">
+                  <Zap className="w-4 h-4 text-[#00F2FE]" />
+                  {t.navbar.faq}
+                </a>
+              </div>
+
+              <div className="mt-auto border-t border-white/10 pt-6">
+                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/30 mb-4">Settings</p>
+                <div className="flex items-center justify-between mb-8">
+                  <span className="text-white/70 text-xs font-bold uppercase tracking-wider">Language</span>
+                  <LanguageSwitcher />
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -190,11 +266,14 @@ function MockupPhone() {
 
 // --- App Store Button Component ---
 function StoreButton({ icon, store, desc }: { icon: React.ReactNode, store: string, desc: string }) {
+  const { playHover, playClick } = useSound();
   return (
     <motion.a 
       href="#" 
       whileTap={{ scale: 0.95 }}
       whileHover={{ scale: 1.02 }}
+      onMouseEnter={playHover}
+      onClick={playClick}
       className="flex items-center justify-center gap-2 md:gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-3 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl backdrop-blur-md transition-all group flex-1 sm:flex-none max-w-[160px] sm:max-w-none shrink-0"
     >
        <div className="text-white group-hover:scale-110 transition-transform flex-shrink-0">
@@ -213,6 +292,68 @@ function Hero() {
   const { t } = useLanguage();
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center pt-24 pb-12 overflow-hidden px-6">
+      {/* Neural Bokeh Spheres Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-70">
+        {Array.from({ length: 8 }).map((_, i) => {
+           const size = Math.random() * 250 + 150;
+           return (
+             <motion.div
+               key={`bokeh-${i}`}
+               className="absolute rounded-full"
+               style={{
+                 width: size,
+                 height: size,
+                 left: `${Math.random() * 100}%`,
+                 top: `${Math.random() * 100}%`,
+                 background: `radial-gradient(circle, rgba(255,255,255,${Math.random() * 0.04 + 0.01}) 0%, rgba(255,255,255,0) 70%)`,
+                 filter: `blur(${Math.random() * 20 + 10}px)`,
+               }}
+               animate={{
+                 y: [0, Math.random() * -400 - 100, Math.random() * 200 + 100],
+                 x: [0, Math.random() * 300 - 150, Math.random() * -300 + 150],
+                 scale: [1, Math.random() * 0.4 + 1.1, 1],
+               }}
+               transition={{
+                 duration: Math.random() * 25 + 25,
+                 repeat: Infinity,
+                 repeatType: "reverse",
+                 ease: "linear",
+               }}
+             />
+           );
+        })}
+      </div>
+
+      {/* Liquid Particles Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-50">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <motion.div
+            key={`particle-${i}`}
+            className="absolute rounded-full"
+            style={{
+              width: Math.random() * 150 + 50,
+              height: Math.random() * 150 + 50,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              background: `radial-gradient(circle, rgba(0,242,254,0.15) 0%, rgba(142,45,226,0.05) 100%)`,
+              filter: 'blur(30px)',
+            }}
+            animate={{
+              y: [0, Math.random() * -200 - 50, Math.random() * 100],
+              x: [0, Math.random() * 100 - 50, Math.random() * -100 + 50],
+              scale: [1, Math.random() * 0.5 + 1.2, 1],
+              opacity: [0.3, 0.8, 0.3],
+            }}
+            transition={{
+              duration: Math.random() * 15 + 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+
       <div className="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center z-10">
         
         {/* Typographic Left Col */}
@@ -266,17 +407,63 @@ function Hero() {
 }
 
 // --- Bento Features ---
-function BentoCard({ title, desc, icon: Icon, span = false, glow }: { title: string, desc: string, icon: React.ElementType, span?: boolean, glow: string }) {
+function BentoCard({ title, desc, icon: Icon, span = false, glow, imgSrc }: { title: string, desc: string, icon: React.ElementType, span?: boolean, glow: string, imgSrc?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { playHover } = useSound();
+
+  // Magnetic Pull Effect
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15, mass: 0.5 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15, mass: 0.5 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["5deg", "-5deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-5deg", "5deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <motion.div 
+      ref={ref}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       whileHover={{ scale: 0.98 }}
+      onMouseEnter={playHover}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 1000,
+      }}
       className={`glass-card p-8 flex flex-col justify-between group overflow-hidden ${span ? 'md:col-span-2' : 'col-span-1'} border border-white/5 hover:border-white/10 transition-all duration-500 min-h-[300px] relative shrink-0 w-[85vw] md:w-auto snap-center snap-always`}
     >
       <div className={`absolute -inset-10 opacity-30 group-hover:opacity-60 transition-opacity duration-700 blur-[50px] mix-blend-screen pointer-events-none rounded-full ${glow}`} />
       <div className="absolute inset-0 bg-noise opacity-[0.15] mix-blend-overlay pointer-events-none" />
+
+      {imgSrc && (
+        <div className="absolute inset-0 z-0 opacity-20 group-hover:opacity-40 transition-opacity duration-500 flex items-end justify-end overflow-hidden pointer-events-none">
+           <img src={imgSrc} alt={title} className="w-full h-full object-cover mix-blend-overlay" />
+        </div>
+      )}
 
       <div className="w-12 h-12 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center relative z-10">
         <Icon className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
@@ -306,12 +493,14 @@ function Features() {
                title={t.features.items[0].title} 
                desc={t.features.items[0].desc} 
                glow="bg-gradient-to-br from-[#00F2FE] to-[#4FACFE]"
+               imgSrc="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop"
              />
              <BentoCard 
                icon={MessageSquare} 
                title={t.features.items[1].title} 
                desc={t.features.items[1].desc} 
                glow="bg-gradient-to-tr from-[#FF9A9E] to-[#FECFEF]"
+               imgSrc="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop"
              />
              <BentoCard 
                icon={Fingerprint} 
@@ -319,6 +508,7 @@ function Features() {
                desc={t.features.items[2].desc} 
                span={true}
                glow="bg-gradient-to-b from-[#8E2DE2] to-[#4A00E0]"
+               imgSrc="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop"
              />
           </div>
           
@@ -337,7 +527,7 @@ function Features() {
 }
 
 // --- Interactive Mascot Component ---
-function InteractiveMascot({ className = "", glowColor = "rgba(0,242,254,0.4)", isFloating = false }: { className?: string, glowColor?: string, isFloating?: boolean }) {
+function InteractiveMascot({ className = "", glowColor = "rgba(0,242,254,0.4)", isFloating = false, isSurprised = false }: { className?: string, glowColor?: string, isFloating?: boolean, isSurprised?: boolean }) {
   return (
     <div className={`relative z-20 flex justify-center items-center ${className}`}>
        <div className="w-full h-full flex items-center justify-center relative group/mascot">
@@ -349,8 +539,8 @@ function InteractiveMascot({ className = "", glowColor = "rgba(0,242,254,0.4)", 
              style={{ 
                filter: `drop-shadow(0 0 30px ${glowColor}) brightness(1.2)`
              }}
-             animate={isFloating ? { y: [0, -20, 0], scale: [1, 1.05, 1] } : {}}
-             transition={isFloating ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : {}}
+             animate={isFloating ? { y: [0, -20, 0], scale: [1, 1.05, 1] } : (isSurprised ? { scale: 1.25, rotate: [0, -10, 10, -10, 10, 0] } : { scale: 1, rotate: 0 })}
+             transition={isFloating ? { duration: 6, repeat: Infinity, ease: "easeInOut" } : (isSurprised ? { duration: 0.5, repeat: Infinity, repeatType: "loop" } : { type: "spring" })}
              referrerPolicy="no-referrer" 
            />
          </div>
@@ -451,6 +641,19 @@ function MascotMiniGame() {
   const smoothY = useSpring(y, springConfig);
   
   const [synced, setSynced] = React.useState(0);
+  const [isSurprised, setIsSurprised] = React.useState(false);
+
+  useMotionValueEvent(smoothX, "change", (latestX) => {
+    const dx = x.get() - latestX;
+    const dy = y.get() - smoothY.get();
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distance < 50 && !isSurprised) {
+      setIsSurprised(true);
+    } else if (distance >= 50 && isSurprised) {
+      setIsSurprised(false);
+    }
+  });
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -493,7 +696,7 @@ function MascotMiniGame() {
          style={{ x: smoothX, y: smoothY }}
          className="absolute left-1/2 top-1/2 -ml-24 -mt-24 md:-ml-48 md:-mt-48 w-48 h-48 md:w-96 md:h-96 pointer-events-none z-30"
        >
-          <InteractiveMascot className="w-full h-full drop-shadow-[0_0_50px_rgba(0,242,254,0.6)]" glowColor={`rgba(0,242,254,${0.3 + (synced / 100)})`} />
+          <InteractiveMascot className="w-full h-full drop-shadow-[0_0_50px_rgba(0,242,254,0.6)]" glowColor={`rgba(0,242,254,${0.3 + (synced / 100)})`} isSurprised={isSurprised} />
           <div 
             className="absolute inset-0 rounded-full bg-gradient-to-r from-[#00F2FE] to-[#8E2DE2] blur-[80px] -z-10 mix-blend-screen transition-all duration-300"
             style={{ opacity: synced > 0 ? 0.2 + (synced/200) : 0, transform: `scale(${1 + synced/100})` }}
@@ -604,8 +807,23 @@ function FAQ() {
 // --- Final CTA ---
 function FinalCTA() {
   const { t } = useLanguage();
+  const { playHover, playClick } = useSound();
   return (
     <section className="relative min-h-[100vh] flex flex-col items-center justify-center py-24 px-6 overflow-hidden">
+        {/* Premium Shimmer Sweep */}
+        <motion.div 
+          className="absolute top-0 bottom-0 z-20 pointer-events-none bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-[30deg] w-[150%] md:w-[75%]"
+          animate={{
+            left: ['-150%', '200%']
+          }}
+          transition={{
+            duration: 3.5,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatDelay: 4.5
+          }}
+        />
+
         {/* Organic Expanding Logo/Blob */}
         <motion.div 
            initial={{ scale: 0.2, opacity: 0 }}
@@ -623,6 +841,8 @@ function FinalCTA() {
              <motion.button 
                whileHover={{ scale: 1.05 }}
                whileTap={{ scale: 0.95 }}
+               onMouseEnter={playHover}
+               onClick={playClick}
                className="relative overflow-hidden bg-white text-black px-8 py-4 rounded-full font-sans font-bold text-sm tracking-widest uppercase transition-all shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.6)]"
              >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/10 to-transparent translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000" />
@@ -644,25 +864,68 @@ function Footer() {
   );
 }
 
+function ScrollToTopButton() {
+  const { scrollY } = useScroll();
+  const { playHover, playClick } = useSound();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    // Show after scrolling past roughly the Hero section (~100vh, say 600px)
+    if (latest > 600) {
+      if (!isVisible) setIsVisible(true);
+    } else {
+      if (isVisible) setIsVisible(false);
+    }
+  });
+
+  const scrollToTop = () => {
+    playClick();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 20 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          onClick={scrollToTop}
+          onMouseEnter={playHover}
+          className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 p-3 md:p-4 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-colors shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(0,242,254,0.15)] group overflow-hidden outline-none focus:ring-2 focus:ring-[#00F2FE]/50"
+          aria-label="Scroll to top"
+        >
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#00F2FE]/20 to-[#8E2DE2]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          <ArrowUp className="w-5 h-5 md:w-6 md:h-6 text-white/70 group-hover:text-white transition-colors relative z-10 group-hover:-translate-y-0.5 ease-out duration-300" />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function App() {
   return (
     <LanguageProvider>
-      <div className="font-sans bg-[#000000] min-h-screen text-white selection:bg-[#00F2FE]/30">
-        <ScrollProgress />
-        {/* Global Noise Layer attached via index.css body applied to a fixed div */}
-        <div className="fixed inset-0 bg-noise z-50 pointer-events-none mix-blend-screen opacity-40"></div>
-        
-        <div className="relative z-10">
-          <Navbar />
-          <Hero />
-          <Features />
-          <TheFlow />
-          <Testimonials />
-          <FAQ />
-          <FinalCTA />
-          <Footer />
+      <SoundProvider>
+        <div className="font-sans bg-[#000000] min-h-screen text-white selection:bg-[#00F2FE]/30">
+          <ScrollProgress />
+          {/* Global Noise Layer attached via index.css body applied to a fixed div */}
+          <div className="fixed inset-0 bg-noise z-50 pointer-events-none mix-blend-screen opacity-40"></div>
+          
+          <div className="relative z-10">
+            <Navbar />
+            <Hero />
+            <Features />
+            <TheFlow />
+            <Testimonials />
+            <FAQ />
+            <FinalCTA />
+            <Footer />
+          </div>
+          <ScrollToTopButton />
         </div>
-      </div>
+      </SoundProvider>
     </LanguageProvider>
   );
 }
