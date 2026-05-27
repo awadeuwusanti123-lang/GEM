@@ -8,18 +8,57 @@ import { SoundProvider, useSound } from './SoundContext';
 
 // --- Global Progress Bar ---
 function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress, scrollY } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001
   });
 
+  const { t } = useLanguage();
+  const [activeSection, setActiveSection] = useState(t.navbar.overview || "Overview");
+
+  useMotionValueEvent(scrollY, "change", () => {
+    const sections = Array.from(document.querySelectorAll("section"));
+    let currentId = t.navbar.overview || "Overview";
+    
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const triggerPoint = window.innerHeight * 0.4;
+      if (rect.top <= triggerPoint && rect.bottom >= triggerPoint) {
+        if (section.id === "features") currentId = t.navbar.neuralSync;
+        else if (section.id === "flow") currentId = t.navbar.ecosystem;
+        else if (section.id === "testimonials") currentId = t.navbar.reviews;
+        else if (section.id === "faq") currentId = t.navbar.faq;
+        else if (!section.id) {
+          if (rect.bottom > window.innerHeight) currentId = t.navbar.overview || "Overview";
+          else currentId = "Join the Future"; 
+        }
+      }
+    });
+    
+    if (activeSection !== currentId) {
+      setActiveSection(currentId);
+    }
+  });
+
   return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#00F2FE] via-[#4FACFE] to-[#8E2DE2] origin-left z-[100]"
-      style={{ scaleX }}
-    />
+    <>
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#00F2FE] via-[#4FACFE] to-[#8E2DE2] origin-left z-[100]"
+        style={{ scaleX }}
+      />
+      <div className="fixed top-4 left-4 z-[100] hidden md:block">
+         <motion.div 
+           key={activeSection}
+           initial={{ opacity: 0, y: -10 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 mix-blend-difference pointer-events-none drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"
+         >
+            {activeSection}
+         </motion.div>
+      </div>
+    </>
   );
 }
 
@@ -768,10 +807,26 @@ function FAQ() {
 
   return (
     <section id="faq" className="py-24 md:py-32 px-6 relative flex flex-col items-center overflow-hidden bg-gradient-to-b from-black via-[#001015] to-black">
-      {/* Colorful glows */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00F2FE]/20 to-transparent"></div>
-      <div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-[#00F2FE]/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen opacity-60"></div>
-      <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-[#4FACFE]/10 blur-[120px] rounded-full pointer-events-none mix-blend-screen opacity-60"></div>
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00F2FE]/20 to-transparent z-10"></div>
+      
+      {/* Liquid Intelligence Gradient Mesh */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-40 md:opacity-60">
+         <motion.div 
+           className="absolute top-1/4 -left-1/4 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[#00F2FE]/20 blur-[100px] md:blur-[150px] rounded-full"
+           animate={{ x: [0, 150, 0], y: [0, 100, 0], scale: [1, 1.2, 1] }}
+           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+         />
+         <motion.div 
+           className="absolute top-1/2 -right-1/4 w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-[#8E2DE2]/20 blur-[100px] md:blur-[120px] rounded-full"
+           animate={{ x: [0, -100, 0], y: [0, -150, 0], scale: [1, 1.3, 1] }}
+           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+         />
+         <motion.div 
+           className="absolute -bottom-1/4 left-1/4 w-[500px] h-[500px] md:w-[800px] md:h-[800px] bg-[#4FACFE]/15 blur-[100px] md:blur-[150px] rounded-full"
+           animate={{ x: [0, -100, 100, 0], y: [0, -200, 0], scale: [1, 1.1, 1] }}
+           transition={{ duration: 30, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+         />
+      </div>
 
       <div className="text-center mb-16 md:mb-24 relative z-10 w-full">
          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#00F2FE]">{t.faq.title}</h2>
