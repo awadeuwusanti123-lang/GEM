@@ -95,19 +95,19 @@ function Navbar() {
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[90%] max-w-5xl"
+        className="fixed top-4 md:top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-[95%] md:w-[90%] max-w-5xl"
       >
-        <div className="glass-pill px-3 py-3 md:px-5 md:py-2.5 rounded-full border border-white/10 bg-[#0A0A0A]/95 supports-[backdrop-filter]:bg-[#0A0A0A]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_4px_40px_rgba(0,242,254,0.15)] flex items-center justify-between gap-1 md:gap-4 overflow-hidden relative">
+        <div className="glass-pill px-2 py-2 sm:px-3 sm:py-3 md:px-5 md:py-2.5 rounded-full border border-white/10 bg-[#0A0A0A]/95 supports-[backdrop-filter]:bg-[#0A0A0A]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.8)] hover:shadow-[0_4px_40px_rgba(0,242,254,0.15)] flex items-center justify-between gap-1 sm:gap-2 md:gap-4 overflow-hidden relative">
           
           {/* Mobile Menu Toggle button */}
           <div className="md:hidden flex items-center pr-1 shrink-0">
-            <button onClick={() => setMobileMenuOpen(true)} className="p-2 text-white/70 hover:text-white transition-colors">
-              <Menu className="w-5 h-5" />
+            <button onClick={() => setMobileMenuOpen(true)} className="p-1 sm:p-2 text-white/70 hover:text-white transition-colors">
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
 
-          <div className="flex items-center cursor-pointer group shrink-0 flex-1 justify-start md:flex-none">
-            <div className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 flex items-center justify-center relative shrink-0">
+          <div className="flex items-center cursor-pointer group shrink-0 flex-1 justify-start md:flex-none min-w-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 flex items-center justify-center relative shrink-0">
                <img 
                  src="https://drive.google.com/thumbnail?id=1FkdeDTBIp7pNZ9x1vtMPVtQQ7BtBedXw&sz=w1000" 
                  alt="GEM Mascot" 
@@ -118,7 +118,7 @@ function Navbar() {
                  referrerPolicy="no-referrer"
                />
             </div>
-            <span className="font-sans font-bold text-lg md:text-xl lg:text-2xl tracking-tight text-white leading-none ml-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-[#00F2FE] transition-all duration-300">GEM</span>
+            <span className="hidden sm:block font-sans font-bold text-lg md:text-xl lg:text-2xl tracking-tight text-white leading-none ml-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-[#00F2FE] transition-all duration-300">GEM</span>
           </div>
 
           <div className="hidden md:flex items-center justify-center flex-1 gap-4 lg:gap-8 text-[10px] lg:text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 px-2 lg:px-0">
@@ -128,10 +128,10 @@ function Navbar() {
             <a href="#faq" className="hover:text-white shrink-0 hover:scale-105 transition-all duration-300">{t.navbar.faq}</a>
           </div>
 
-          <div className="flex items-center gap-1 md:gap-2 lg:gap-4 shrink-0 justify-end">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-4 shrink-0 justify-end flex-wrap sm:flex-nowrap min-w-0">
             <button 
               onClick={toggleMute}
-              className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors border border-white/10 shrink-0 select-none outline-none focus:ring-2 focus:ring-[#00F2FE]/50"
+              className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition-colors border border-white/10 shrink-0 select-none outline-none focus:ring-2 focus:ring-[#00F2FE]/50"
             >
               {isMuted ? <VolumeX className="w-4 h-4 md:w-5 md:h-5 text-white/70" /> : <Volume2 className="w-4 h-4 md:w-5 md:h-5 text-white" />}
             </button>
@@ -141,9 +141,9 @@ function Navbar() {
             <motion.button 
               whileTap={{ scale: 0.95 }}
               whileHover={{ scale: 1.05 }}
-              className="flex items-center justify-center px-4 py-2 lg:px-6 lg:py-2.5 rounded-full bg-white text-black text-[9px] lg:text-xs font-bold uppercase tracking-wider hover:bg-[#00F2FE] hover:text-black transition-colors whitespace-nowrap shrink-0 hover:shadow-[0_0_20px_rgba(0,242,254,0.4)]"
+              className="flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 lg:px-6 lg:py-2.5 rounded-full bg-white text-black text-[9px] lg:text-xs font-bold uppercase tracking-wider hover:bg-[#00F2FE] hover:text-black transition-colors whitespace-nowrap shrink min-w-0 truncate hover:shadow-[0_0_20px_rgba(0,242,254,0.4)]"
             >
-              {t.navbar.getAccess}
+              <span className="truncate">{t.navbar.getAccess}</span>
             </motion.button>
           </div>
         </div>
